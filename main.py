@@ -1,4 +1,6 @@
 from BackgroundCode.DownloadPics import DownloadMultipleTags
+from apscheduler.schedulers.background import BlockingScheduler
+
 
 def manual_download():
     '''
@@ -51,7 +53,9 @@ def auto_download():
     DownloadMultipleTags(list_of_tags).initiate_download()
 
 def main():
-    auto_download()
 
+    sched = BlockingScheduler()
+    sched.add_job(auto_download(), 'cron', day_of_week='mon-sun', hour=1, minute=00)
+    sched.start()
 
 main()
