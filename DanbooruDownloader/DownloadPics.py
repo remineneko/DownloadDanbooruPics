@@ -449,4 +449,4 @@ if __name__ == '__main__':
         print("-------------------------------------------------------------------------------------------------------")
         print()
         print("Previous tag does not have any pictures. Exception handled.")
-        DownloadDanbooruPics('sesshouin_kiara',"C:\\Users\\Hoang Tran\\Desktop\\Danbooru Collection").initiate_download()
+        DownloadDanbooruPics('sesshouin_kiara',"prefered\\download\\location").initiate_download()
