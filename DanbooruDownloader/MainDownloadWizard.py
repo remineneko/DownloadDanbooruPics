@@ -3,6 +3,11 @@ import os
 
 
 def isPath(path):
+    '''
+    Checks if a directory is valid or not
+    :param path: A directory
+    :return: The directory if and only if it is valid.
+    '''
     if os.path.isdir(path) and len(path) != 0:
         print("The path exists. Continuing with the download...")
         return path
@@ -26,7 +31,9 @@ def isContinue(answer):
 
 def question():
     '''
-    Manually let the user pick and download the tags
+    Manually let the user pick the tags
+    :return: A list of tags
+    :type: list
     '''
     user_input_list = []
     continue_input = True
@@ -52,6 +59,11 @@ def question():
     return user_input_list
 
 def start_download(user_input_list,path):
+    '''
+    Starts the download
+    :param user_input_list: A list of inputs
+    :param path: A directory
+    '''
     DownloadMultipleTags(user_input_list, path).initiate_download()
 
 
