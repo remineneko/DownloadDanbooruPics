@@ -3,11 +3,11 @@ import os
 
 
 def isPath(path):
-    if os.path.isdir(path):
+    if os.path.isdir(path) and len(path) != 0:
         print("The path exists. Continuing with the download...")
         return path
     else:
-        new_path = input('Please provide a path to the folder you want your pictures to be installed:')
+        new_path = input('Please provide a path to the folder you want your pictures to be installed:\n')
         return isPath(new_path)
 
 
@@ -24,7 +24,7 @@ def isContinue(answer):
     return continue_adding
 
 
-def start_download(path):
+def question():
     '''
     Manually let the user pick and download the tags
     '''
@@ -49,6 +49,9 @@ def start_download(path):
                     satisfactory_format = False
             continue_input = isContinue(answer)
     print()
+    return user_input_list
+
+def start_download(user_input_list,path):
     DownloadMultipleTags(user_input_list, path).initiate_download()
 
 

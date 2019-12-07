@@ -6,7 +6,7 @@ import urllib.request
 import os
 import settings
 import urllib.error
-from DanbooruDownloader import DumpToPickle
+from DanbooruDownloader.DumpToPickle import DumpToPickle
 
 
 ANON_SEARCH_LIMIT = 1000
@@ -57,6 +57,7 @@ class DownloadDanbooruPics:
                 self.__obtain_post_list()
             else:
                 self.__update_new_posts()
+
 
     def __print(self):
         '''
@@ -240,6 +241,7 @@ class DownloadDanbooruPics:
             else:
                 cur_data.extend(self.__obtain_post_list_per_page(start)[:remaining_new_posts-1])
             start += 1
+
         DumpToPickle(self.__pickle_path,cur_data).DumpToPickle()
 
     def __obtain_post_ID(self, post):
@@ -400,7 +402,6 @@ class DownloadDanbooruPics:
 
                     link_pos += 1
         print("Every picture has been downloaded!")
-        print("Received tag:")
 
     def initiate_download(self):
         '''
@@ -449,4 +450,4 @@ if __name__ == '__main__':
         print("-------------------------------------------------------------------------------------------------------")
         print()
         print("Previous tag does not have any pictures. Exception handled.")
-        DownloadDanbooruPics('sesshouin_kiara',"prefered\\download\\location").initiate_download()
+        DownloadMultipleTags(['sesshouin_kiara'],"C:\\Users\\Hoang Tran\Desktop\\Danbooru Collection").initiate_download()
