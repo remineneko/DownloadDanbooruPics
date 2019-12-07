@@ -1,9 +1,9 @@
-from BackgroundCode.DownloadModes import auto_download
-from apscheduler.schedulers.background import BlockingScheduler
+from DanbooruDownloader import start_download, isPath
 
-def main():
-    sched = BlockingScheduler()
-    sched.add_job(auto_download(), 'cron', day_of_week='mon-sun', hour=1, minute=00)
-    sched.start()
 
-main()
+print('Welcome to Danbooru Downloader!')
+print('Please provide a path to the folder you want your pictures to be installed:')
+path = input()
+verified_path = isPath(path)
+start_download(verified_path)
+
