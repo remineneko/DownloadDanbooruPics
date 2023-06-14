@@ -23,7 +23,7 @@ class BaseTagHandler:
         self._tag_to_search = tag + f" limit:{MAX_POST_PER_PAGE}"
         self._db = db
         self._access = access
-        self._post_limit = GOLD_PAGE_SEARCH_LIMIT if self.access.is_gold() else NORMAL_PAGE_SEARCH_LIMIT
+        self._page_limit = GOLD_PAGE_SEARCH_LIMIT if self._access.is_gold() else NORMAL_PAGE_SEARCH_LIMIT
 
 
     def _num_pages(self):
@@ -45,11 +45,15 @@ class BaseTagHandler:
         except ValueError:
             return 1
         
-    def convert_to_tag_object(self):
-        tag_name = self._tag
-        tag_data = TagContent([
+    def convert_to_tag_object(self, limit: int):
+        tag_name = [self._tag]
+        content = [
             MediaMetadata(*e) for e in self._db.all_values_by_tag(self._tag)
-        ])
+        ]
+
+        if limit != -1:
+            content = content[:limit]
+        tag_data = [TagContent(content)]
         return Tags(tag_name=tag_name, tag_data=tag_data)
         
 
@@ -60,7 +64,7 @@ class TagHandler(BaseTagHandler):
         # force retry when Danbooru decides to timeout the boi.
         while not end_run_again:
             try:
-                post_list = self.access.post_list(page=page, tags=self._tag_to_search)
+                post_list = self._access.post_list(page=page, tags=self._tag_to_search)
                 end_run_again = True
             except exceptions.PybooruHTTPError as e:
                 print(f"An exception occurred while loading page {page} of tag {self._tag}: {e}")
@@ -70,7 +74,7 @@ class TagHandler(BaseTagHandler):
     def update(self, ignore_duplicate=False):
         start_page = 1
         cont_access = True
-        while cont_access and start_page <= self.page_limit:
+        while cont_access and start_page <= self._page_limit:
             res = self.page_search(start_page)
             if len(res) == 0:
                 cont_access = False
@@ -101,7 +105,7 @@ class AsyncTagHandler(BaseTagHandler):
         # force retry when Danbooru decides to timeout the boi.
         while not end_run_again:
             try:
-                post_list = self.access.post_list(page=page, tags=self._tag_to_search)
+                post_list = self._access.post_list(page=page, tags=self._tag_to_search)
                 end_run_again = True
             except exceptions.PybooruHTTPError as e:
                 print(f"An exception occurred while loading page {page} of tag {self._tag}: {e}")
@@ -111,7 +115,7 @@ class AsyncTagHandler(BaseTagHandler):
     async def update(self, ignore_duplicate=False):
         start_page = 1
         cont_access = True
-        while cont_access and start_page <= self.page_limit:
+        while cont_access and start_page <= self._page_limit:
             res = await self.page_search(start_page)
             if len(res) == 0:
                 cont_access = False

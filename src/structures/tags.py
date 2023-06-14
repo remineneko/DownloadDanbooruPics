@@ -4,12 +4,15 @@ import warnings
 from dataclasses import dataclass
 from typing import Any, Union, Dict, List
 
-from media_metadata import MediaMetadata
+from .media_metadata import MediaMetadata
 
 
 @dataclass
 class TagContent:
     content: List[MediaMetadata]
+
+    def __len__(self):
+        return len(self.content)
 
 
 class Tags:

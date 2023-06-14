@@ -19,7 +19,7 @@ DB_PASSWORD = os.environ.get('DB_PASSWORD')
 
 # for the Danbooru API
 SITENAME = 'danbooru'
-USERNAME = os.environ.get('USERNAME')
+USERNAME = os.environ.get('DANBOORU_USERNAME')
 API_KEY = os.environ.get('API_KEY')
 
 # for the downloading location
