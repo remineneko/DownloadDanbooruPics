@@ -2,7 +2,7 @@ from pybooru import Danbooru
 
 
 class CustomDanbooru(Danbooru):
-    def is_gold(self, user_name: str):
+    def is_gold(self):
         """
         Checks whether the user is a gold user or not.
 
@@ -14,7 +14,7 @@ class CustomDanbooru(Danbooru):
             30      # Gold members.
         ]
 
-        if self.user_list(name=user_name, level=levels_range[1]):
+        if self.user_list(name=self.username, level=levels_range[1]):
             return True
         else:
             return False
