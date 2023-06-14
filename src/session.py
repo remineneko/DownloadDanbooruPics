@@ -56,12 +56,12 @@ class DownloadSession:
     def __contains__(self, item):
         return item in self._tags.tag_name
     
-    def download(self):
+    def download(self, auto_save_to_other_tags=True):
         for tag_ind in range(len(self._tags)):
-            self._single_tag_download(self._tags.tag_name[tag_ind], self._tags.tag_data[tag_ind])
+            self._single_tag_download(self._tags.tag_name[tag_ind], self._tags.tag_data[tag_ind], auto_save_to_other_tags)
 
-    def _single_tag_download(self, tag_name: str, tag_data: TagContent):
-        args = ((tag_name, content) for content in tag_data.content)
+    def _single_tag_download(self, tag_name: str, tag_data: TagContent, auto_save_to_other_tags: bool):
+        args = ((tag_name, content, auto_save_to_other_tags) for content in tag_data.content)
         with concurrent.futures.ThreadPoolExecutor(
             max_workers=self._worker_amt
         ) as executor:
@@ -83,7 +83,7 @@ class DownloadSession:
             return False
         return os.stat(file_path).st_size == expected_size
 
-    def _single_file_download(self, tag_name: str, media_metadata: MediaMetadata):
+    def _single_file_download(self, tag_name: str, media_metadata: MediaMetadata, auto_save_to_other_tags: bool):
         media_id = media_metadata.media_id
         media_ext = media_metadata.media_ext
         media_url = media_metadata.media_url
@@ -105,19 +105,20 @@ class DownloadSession:
                 content = urllib.request.urlopen(req)
                 with open(full_download_dir, 'wb') as downloaded_pic:
                     downloaded_pic.write(content.read())
-                for sub_tag in tags.split():
-                    if sub_tag in self._tags.tag_name:
-                        tag_location = os.path.join(self._location, self.alter_name(sub_tag))
-                        try:
-                            os.makedirs(tag_location, mode = 0o777)
-                        except FileExistsError:
-                            pass
+                if auto_save_to_other_tags:
+                    for sub_tag in tags.split():
+                        if sub_tag in self._tags.tag_name:
+                            tag_location = os.path.join(self._location, self.alter_name(sub_tag))
+                            try:
+                                os.makedirs(tag_location, mode = 0o777)
+                            except FileExistsError:
+                                pass
 
-                        paste_loc = os.path.join(tag_location, pic_name)
-                        shutil.copyfile(full_download_dir, paste_loc)
+                            paste_loc = os.path.join(tag_location, pic_name)
+                            shutil.copyfile(full_download_dir, paste_loc)
 
         except IncompleteRead:
-            self._single_file_download(tag_name, media_metadata)
+            self._single_file_download(tag_name, media_metadata, auto_save_to_other_tags)
 
     
 
