@@ -59,7 +59,7 @@ class DownloadSession:
     def download(self, auto_save_to_other_tags):
         for tag_ind in range(len(self._tags)):
             self._single_tag_download(self._tags.tag_name[tag_ind], self._tags.tag_data[tag_ind], auto_save_to_other_tags)
-            print(f"Completed downloading media files for tag {self._tags}")
+            print(f"Completed downloading media files for tag {self._tags.tag_name[tag_ind]}")
 
     def _single_tag_download(self, tag_name: str, tag_data: TagContent, auto_save_to_other_tags: bool):
         args = ((tag_name, content, auto_save_to_other_tags) for content in tag_data.content)

@@ -11,10 +11,16 @@ class CustomDanbooru(Danbooru):
         """
         levels_range = [
             20,     # Normal members
-            30      # Gold members.
+            30,     # Gold members.
+            31,     # Platinum  
+            32,     # Builder
+            33,     # Contributor 
+            35,     # Janitor  
+            40,     # Moderator  
+            50      # Admin
         ]
 
-        if self.user_list(name=self.username, level=levels_range[1]):
+        if any([self.user_list(name=self.username, level=i) for i in levels_range[1:]]):
             return True
         else:
             return False
