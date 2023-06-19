@@ -29,7 +29,8 @@ python3 main.py start --tags-file -tf \
                       --ignore-duplicates \
                       --limit \
                       --location \
-                      --use-async
+                      --use-async \
+                      --batch-size
 ```
 
 Explanation:
@@ -47,3 +48,5 @@ Explanation:
 - `--location` option should only be used when the desired location for downloading media files is different from the default stated in the .env file.
 
 - `--use-async` enables usage of asynchronicity for the program.
+
+- `--batch-size` limits how many tags are handled at the same time by concurrency. Helpful to avoid being timeouted by Danbooru, but you can set it to `-1` to handle all tags in the session altogether.

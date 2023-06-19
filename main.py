@@ -65,7 +65,17 @@ def main():
     default=False,
     help='Whether to use asynchronicity in the program.'
 )
-def start(tags_file, worker_amt, auto_save_to_tags, ignore_duplicates, limit, location, use_async):
+@click.option(
+    '--batch-size',
+    default=5,
+    type=click.INT,
+    help='The max size of each batch for asynchronous usage.'
+)
+def start(
+    tags_file, worker_amt, auto_save_to_tags, 
+    ignore_duplicates, limit, location, use_async,
+    batch_size
+):
     tags = get_tags(tags_file)
     new_db_connection = Database()
     new_access = CustomDanbooru(
@@ -79,7 +89,8 @@ def start(tags_file, worker_amt, auto_save_to_tags, ignore_duplicates, limit, lo
         )
     if use_async:
         print("Using async to update the tags.")
-        asyncio.run(_gather_tags(new_access, tags, new_db_connection, ignore_duplicates))
+        print(f"Handling {batch_size} tag(s) at once.")
+        asyncio.run(_gather_tags(new_access, tags, batch_size, new_db_connection, ignore_duplicates))
     for tag in tags:
         handler = TagHandler(new_access, tag, new_db_connection)
         if not use_async: # no need to update anymore if async has been used.
@@ -94,9 +105,20 @@ def start(tags_file, worker_amt, auto_save_to_tags, ignore_duplicates, limit, lo
         print("Auto saving the images to tags in the downloading job.")
     session.download(auto_save_to_tags)
 
-async def _gather_tags(access, tags, db, ignore_duplicates):
-    await asyncio.gather(*[asyncio.create_task(AsyncTagHandler(access, tag, db).update(ignore_duplicates)) for tag in tags])
-
+async def _gather_tags(access, tags, batch_size, db, ignore_duplicates):
+    work = [asyncio.create_task(AsyncTagHandler(access, tag, db).update(ignore_duplicates)) for tag in tags]
+    def chunks(lst, n):
+        """Yield successive n-sized chunks from lst."""
+        for i in range(0, len(lst), n):
+            yield lst[i:i + n]
+    if batch_size == -1:
+        await asyncio.gather(*work)
+    elif batch_size > 0:
+        for work_chunk in chunks(work, batch_size):
+            await asyncio.gather(*work_chunk)
+    else:
+        print("Illegal input for batch-size argument. Exiting...")
+        exit()
 if __name__ == "__main__":
     register_repl(main)
     main()
