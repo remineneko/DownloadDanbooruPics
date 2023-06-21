@@ -99,7 +99,6 @@ def start(
             all_tags,
             handler.convert_to_tag_object(limit)
         ])
-
     session = DownloadSession(all_tags, location, worker_amt)
     if auto_save_to_tags:
         print("Auto saving the images to tags in the downloading job.")

@@ -92,6 +92,8 @@ class DownloadSession:
         file_size = media_metadata.media_size
 
         save_location = os.path.join(self._location, self.alter_name(tag_name))
+        if not os.path.isdir(save_location):
+            os.makedirs(save_location, mode=0o777)
         try:
             pic_name = str(media_id) + "." + str(media_ext)
             full_download_dir = self._path_to_temp + "/" + pic_name
@@ -104,11 +106,12 @@ class DownloadSession:
                                   " AppleWebKit/537.36 (KHTML, like Gecko) "
                                   "Chrome/93.0.4577.63 Safari/537.36 Edg/92.0.902.84"})
                 content = urllib.request.urlopen(req)
-                with open(full_download_dir, 'wb') as downloaded_pic:
-                    downloaded_pic.write(content.read())
                 if auto_save_to_other_tags:
+                    with open(full_download_dir, 'wb') as downloaded_pic:
+                        downloaded_pic.write(content.read())
+                        shutil.copyfile(full_download_dir, full_saved_dir)
                     for sub_tag in tags.split():
-                        if sub_tag in self._tags.tag_name:
+                        if sub_tag in self._tags.tag_name and sub_tag != tag_name: # avoid unnecessary duplicates in the downloaded folder
                             tag_location = os.path.join(self._location, self.alter_name(sub_tag))
                             try:
                                 os.makedirs(tag_location, mode = 0o777)
@@ -117,6 +120,9 @@ class DownloadSession:
 
                             paste_loc = os.path.join(tag_location, pic_name)
                             shutil.copyfile(full_download_dir, paste_loc)
+                else:
+                    with open(full_saved_dir, 'wb') as downloaded_pic:
+                        downloaded_pic.write(content.read())
 
         except IncompleteRead:
             self._single_file_download(tag_name, media_metadata, auto_save_to_other_tags)

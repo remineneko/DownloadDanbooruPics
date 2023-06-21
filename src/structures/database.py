@@ -54,8 +54,22 @@ class Database:
             yield entry
 
     def all_values_by_tag(self, tag):
+        if ' ' not in tag:
+            return self._all_values_by_single_tag(tag)
+        else:
+            return self._all_values_by_mult_tags(tag)
+
+    def _all_values_by_single_tag(self, tag):
         self._use_db()
         self.dbcursor.execute(f"SELECT * FROM danbooru WHERE tags LIKE \"%{tag}%\";")
+        entries = self.dbcursor.fetchall()
+        return entries
+    
+    def _all_values_by_mult_tags(self, tag):
+        all_tags = tag.split(' ')
+        all_tags.sort() # danbooru sorts them by order of letter.
+        like_search = f"%{'%'.join(all_tags)}%"
+        self.dbcursor.execute(f"SELECT * FROM danbooru WHERE tags LIKE \"{like_search}\";")
         entries = self.dbcursor.fetchall()
         return entries
 
