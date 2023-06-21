@@ -118,6 +118,13 @@ async def _gather_tags(access, tags, batch_size, db, ignore_duplicates):
     else:
         print("Illegal input for batch-size argument. Exiting...")
         exit()
+
+@main.command()
+def clear_database():
+    new_db_connection = Database()
+    new_db_connection.clear_table()
+    print("Database cleared.")
+
 if __name__ == "__main__":
     register_repl(main)
     main()
